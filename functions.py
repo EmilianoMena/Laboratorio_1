@@ -1,4 +1,4 @@
-#Librerias
+# Librerias
 import pandas as pd
 import data as d
 import numpy as np
@@ -38,5 +38,3 @@ for date in dates:
 df_pasiva=pd.DataFrame(ip)
 df_pasiva['Rendimiento']=df_pasiva['Capital'].pct_change().fillna(0)
 df_pasiva['Rendimiento_Acumulado']=(1+df_pasiva['Rendimiento']).cumprod()-1
-
-print (df_pasiva)
