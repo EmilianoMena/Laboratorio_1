@@ -68,3 +68,21 @@ tickers_31=pd.read_csv('files/NAFTRAC_20220729.csv',skiprows=2)['Ticker']
 ## Pesos 
 ### NAFTRAC 31/01/2020
 pesos_1=pd.read_csv('files/NAFTRAC_20200131.csv',skiprows=2)[['Ticker','Peso (%)']].dropna()
+
+# Elegir los tickers con presencia en todos los archivos
+## Juntar archivos de Tickers
+naftrac=[tickers_1, tickers_2, tickers_3, tickers_4, tickers_5, tickers_6, tickers_7, tickers_8, tickers_9,
+tickers_10, tickers_11, tickers_12, tickers_13, tickers_14, tickers_15, tickers_16, tickers_17, tickers_18,
+tickers_19, tickers_20, tickers_21, tickers_22, tickers_23, tickers_24, tickers_25, tickers_26, tickers_27,
+tickers_28, tickers_29, tickers_30, tickers_31]
+tickers_ip=pd.concat(naftrac, axis=0).T
+## Evaluar cuales Tickers cumplen con la presencia en los 31 archivos
+tickers_ip=tickers_ip.value_counts()>=31
+tickers_ip=pd.DataFrame(tickers_ip[tickers_ip==True]).reset_index()
+tickers_ip=tickers_ip.rename(columns={'index':'Ticker','Ticker':'Ocurrence'})
+## Eliminar los datos en blanco y el ticker MXN que cuenta como CASH
+tickers_ip=tickers_ip.drop([2,3]).reset_index().drop('index', axis=1)
+## Tickers elegidos con sus pesos del primer archivo
+df=pd.merge(tickers_ip,pesos_1,on='Ticker',how='left').dropna().reset_index()
+df=df.drop(['index','Ocurrence'], axis=1)
+df=df.sort_values('Ticker').reset_index().drop('index', axis=1)
