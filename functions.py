@@ -23,17 +23,24 @@ ip_inicial['Comisiones']=round(ip_inicial['Titulos']*ip_inicial['Precios']*comis
 ip_inicial['Capital']=round(ip_inicial['Titulos']*ip_inicial['Precios']-ip_inicial['Comisiones'],2)
 ip_inicial['Efectivo']=ip_inicial['Posturas']-ip_inicial['Capital']-ip_inicial['Comisiones']
 ## Cash
-peso_cash_p= round(100-d.df['Peso (%)'].sum(),2)
-cash_p=((peso_cash_p*ci)/100)+(ip_inicial['Efectivo'].sum())
-comisiones_p=ip_inicial['Comisiones'].sum()
+ip_pc= round(100-d.df['Peso (%)'].sum(),2)
+ip_cash=((ip_pc*ci)/100)+(ip_inicial['Efectivo'].sum())
+ip_efectivo=pd.DataFrame()
+ip_efectivo['Peso (%)']=ip_pc
+ip_efectivo['Cash de Capital Inicial']=(ip_pc*ci)/100
+ip_efectivo['Cash Sobrante de Activos']=(ip_inicial['Efectivo'].sum())
+ip_efectivo['Cash Total']=ip_cash
+## Distribución Inversion Pasiva
+ip_activos=pd.DataFrame({'Activos':d.tickers+['CASH'],'Peso (%)':d.pesos+[ip_pc]})
 ## df_pasiva
 ip=[]
+ip_comisiones=ip_inicial['Comisiones'].sum()
 dates=d.dates
 for date in dates:
     inversion=(d.precios[date].values.tolist()*ip_inicial['Titulos']).sum()
     ip.append({
         'Timestamp':date,
-        'Capital':round(inversion,2)+cash_p-comisiones_p
+        'Capital':round(inversion,2)+ip_pc-ip_comisiones
     })
 df_pasiva=pd.DataFrame(ip)
 df_pasiva['Rendimiento']=df_pasiva['Capital'].pct_change().fillna(0)
