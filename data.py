@@ -1,5 +1,6 @@
 # Librerias 
 import pandas as pd
+import yfinance as yf
 
 # Leer todos los datos necesarios de los archivos NAFTRAC
 ## Tickers
@@ -86,3 +87,23 @@ tickers_ip=tickers_ip.drop([2,3]).reset_index().drop('index', axis=1)
 df=pd.merge(tickers_ip,pesos_1,on='Ticker',how='left').dropna().reset_index()
 df=df.drop(['index','Ocurrence'], axis=1)
 df=df.sort_values('Ticker').reset_index().drop('index', axis=1)
+
+# Obtener los precios de cierre diarios 
+## Tickers para el portafolio
+tickers= ['AC.MX', 'ALFAA.MX', 'ALSEA.MX', 'AMXL.MX', 'ASURB.MX', 'BBAJIOO.MX', 'BIMBOA.MX', 'BOLSAA.MX', 
+'CEMEXCPO.MX', 'CUERVO.MX', 'ELEKTRA.MX', 'FEMSAUBD.MX', 'GAPB.MX', 'GCARSOA1.MX', 'GFINBURO.MX', 'GFNORTEO.MX', 
+'GMEXICOB.MX', 'GRUMAB.MX', 'KIMBERA.MX', 'KOFUBL.MX', 'LABB.MX', 'LIVEPOLC-1.MX', 'MEGACPO.MX', 
+'OMAB.MX', 'ORBIA.MX', 'PE&OLES.MX', 'PINFRA.MX', 'TLEVISACPO.MX', 'WALMEX.MX']
+## Fechas de Archivos NAFTRAC
+dates=['2020-01-31','2020-02-28','2020-03-31','2020-04-30','2020-05-29','2020-06-30','2020-07-31','2020-08-31',
+'2020-09-30','2020-10-30','2020-11-30','2020-12-31','2021-01-29','2021-02-26','2021-03-31','2021-04-30',
+'2021-05-31','2021-06-30','2021-07-30','2021-08-31','2021-09-30','2021-10-26','2021-11-30','2021-12-31',
+'2022-01-26','2022-02-28','2022-03-31','2022-04-29','2022-05-31','2022-06-30','2022-07-29']
+## Peso correspondiente a los diferentes Tickers
+pesos=df['Peso (%)'].values.tolist()
+## Fechas de inicio y fin del periodo
+start= '2020-01-31'
+end='2022-07-30'
+## Funcion de yahoo finance para descargar los precios
+precios=yf.download(tickers=tickers, start=start, end=end, interval='1d')
+precios=precios['Close'].T
