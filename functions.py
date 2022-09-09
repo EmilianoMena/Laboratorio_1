@@ -1,7 +1,9 @@
 # Librerias
+from pydoc import render_doc
 import pandas as pd
 import data as d
 import numpy as np
+import random
 
 # Datos generales para la creación de ambas estrategias (Pasiva y Activa)
 ## Capital inicial
