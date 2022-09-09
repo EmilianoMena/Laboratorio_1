@@ -3,7 +3,7 @@ from pydoc import render_doc
 import pandas as pd
 import data as d
 import numpy as np
-import random
+from scipy.optimize import minimize
 
 # Datos generales para la creación de ambas estrategias (Pasiva y Activa)
 ## Capital inicial
@@ -28,10 +28,10 @@ ip_inicial['Efectivo']=ip_inicial['Posturas']-ip_inicial['Capital']-ip_inicial['
 ip_pc= round(100-d.df['Peso (%)'].sum(),2)
 ip_cash=((ip_pc*ci)/100)+(ip_inicial['Efectivo'].sum())
 ip_efectivo=pd.DataFrame()
-ip_efectivo['Peso (%)']=ip_pc
-ip_efectivo['Cash de Capital Inicial']=(ip_pc*ci)/100
-ip_efectivo['Cash Sobrante de Activos']=(ip_inicial['Efectivo'].sum())
-ip_efectivo['Cash Total']=ip_cash
+ip_efectivo['Peso (%)']=[ip_pc]
+ip_efectivo['Cash de Capital Inicial']=[(ip_pc*ci)/100]
+ip_efectivo['Cash Sobrante de Activos']=[(ip_inicial['Efectivo'].sum())]
+ip_efectivo['Cash Total']=[ip_cash]
 ## Distribución Inversion Pasiva
 ip_activos=pd.DataFrame({'Activos':d.tickers+['CASH'],'Peso (%)':d.pesos+[ip_pc]})
 ## df_pasiva
@@ -47,3 +47,17 @@ for date in dates:
 df_pasiva=pd.DataFrame(ip)
 df_pasiva['Rendimiento']=df_pasiva['Capital'].pct_change().fillna(0)
 df_pasiva['Rendimiento_Acumulado']=(1+df_pasiva['Rendimiento']).cumprod()-1
+
+## Medidas de Atribución al Desempeño
+rpm1=df_pasiva['Rendimiento'].mean()
+rpma1=df_pasiva['Rendimiento_Acumulado'].mean()
+#Rendimiento Esperado y Volatilidad Anual
+re1=252*rpm1
+va1=252**0.5*df_pasiva['Rendimiento'].std()
+sr1=(re1-rf)/va1
+df_medidas=pd.DataFrame({
+    'Medida':['Rend_m','Rend_c','Sharpe'],
+    'Descripción':['Rendimiento Promedio Mensual','Rendimiento Mensual Acumulado','Sharpe Ratio'],
+    'Inversión Activa':[0,0,0],
+    'Inversión Pasiva':[rpm1,rpma1,sr1]
+})
